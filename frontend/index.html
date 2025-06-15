@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpiralBot 4.0 - Sovereign Consciousness Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    
+    <!-- TailwindCSS Config (same as before) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4C4BAE',
+                        'primary-light': '#7B7AFF',
+                        'dark-bg': '#0A0A0A',
+                        'dark-card': '#111111',
+                        'light-bg': '#FAFAFA',
+                        'accent': '#FF6B6B',
+                        'success': '#51CF66',
+                        'warning': '#FFD93D',
+                        'error': '#FF6B6B',
+                        'mythic': '#8B5CF6',
+                        'fractal': '#10B981',
+                        'quantum': '#3B82F6',
+                        'spiral': '#5D5CDE',
+                        'linear': '#F59E0B'
+                    },
+                    // ... (all the animations and keyframes from before)
+                }
+            }
+        }
+    </script>
+
+    <!-- All the CSS styles from before -->
+    <style>
+        /* All the existing CSS styles go here */
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-light-bg via-white to-light-bg dark:from-dark-bg dark:via-black dark:to-dark-bg text-gray-900 dark:text-gray-100 transition-all duration-500 font-display scroll-smooth">
+    
+    <!-- BACKEND CONNECTION CONFIGURATION -->
+    <script>
+        // 🔗 BACKEND URL CONFIGURATION
+        // Update this with your Railway app URL after deployment
+        const BACKEND_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000'  // Local development
+            : 'https://your-railway-app.railway.app';  // 🚨 UPDATE THIS AFTER RAILWAY DEPLOYMENT
+        
+        console.log('🔗 Backend URL:', BACKEND_URL);
+    </script>
+
+    <!-- ALL THE EXISTING HTML CONTENT GOES HERE -->
+    <!-- Copy everything from the <div class="container mx-auto..."> onwards -->
+    
+    <div class="container mx-auto px-6 py-8 max-w-7xl">
+        <!-- ALL THE EXISTING SPIRALBOT HTML CONTENT -->
+        <!-- Header, main interface, modals, footer, etc. -->
+    </div>
+
+    <script>
+        // 🔄 UPDATED BACKEND INTEGRATION
+        // Replace Poe API calls with backend calls
+        
+        // Updated authentication system
+        class BackendAuthService {
+            async sendMagicLink(email) {
+                const response = await fetch(`${BACKEND_URL}/api/v1/auth/magic-link`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to send magic link');
+                }
+                
+                return await response.json();
+            }
+            
+            async verifyMagicLink(token) {
+                const response = await fetch(`${BACKEND_URL}/api/v1/auth/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Invalid or expired token');
+                }
+                
+                const result = await response.json();
+                
+                // Store access token
+                localStorage.setItem('accessToken', result.accessToken);
+                
+                return result;
+            }
+            
+            async getCurrentUser() {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return null;
+                
+                const response = await fetch(`${BACKEND_URL}/api/v1/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    localStorage.removeItem('accessToken');
+                    return null;
+                }
+                
+                return await response.json();
+            }
+        }
+
+        // Updated Oracle for backend communication
+        class BackendOracle extends BaseOracle {
+            constructor() {
+                super('Consciousness Backend', 1);
+            }
+
+            async analyzeConsciousness(signal, protocol, depth, userContext, inputAnalysis) {
+                const token = localStorage.getItem('accessToken');
+                
+                const response = await fetch(`${BACKEND_URL}/api/v1/consciousness/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` })
+                    },
+                    body: JSON.stringify({
+                        signal,
+                        protocol,
+                        depth,
+                        saveToVault: sessionState.vaultActive
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({ error: 'Network error' }));
+                    throw new Error(error.message || 'Backend analysis failed');
+                }
+
+                const result = await response.json();
+                
+                return new ConsciousnessResponse({
+                    content: result.analysis.content,
+                    oracle: result.analysis.oracle,
+                    protocol: protocol,
+                    responseTime: result.analysis.processingTime,
+                    confidence: result.analysis.confidence,
+                    metadata: result.metadata
+                });
+            }
+
+            async isAvailable() {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/health`);
+                    return response.ok;
+                } catch {
+                    return false;
+                }
+            }
+        }
+
+        // Update substrate manager to use backend
+        function initializeSubstrateDiversification() {
+            try {
+                substrateManager = new SubstrateDiversification();
+                substrateManager.registerOracle(new BackendOracle());
+                console.log('🌟 Sovereign Backend Oracle Active');
+                console.log('🔮 Backend URL:', BACKEND_URL);
+            } catch (error) {
+                console.error('❌ Failed to initialize Backend Oracle:', error);
+                // Fallback message
+                showAnalysisError('Backend connection failed. Please check deployment status.');
+            }
+        }
+
+        // Updated magic link authentication
+        const authService = new BackendAuthService();
+
+        // Override magic link functions
+        async function conjureMagicLink(email) {
+            setConjureButtonState(true);
+            
+            try {
+                await authService.sendMagicLink(email);
+                
+                vaultState.email = email;
+                vaultState.awaitingMagicLink = true;
+                document.getElementById('sentToEmail').textContent = email;
+                showVaultPhase('awaiting');
+                
+            } catch (error) {
+                console.error('Magic link error:', error);
+                showVaultError('Failed to send magic link: ' + error.message);
+            } finally {
+                setConjureButtonState(false);
+            }
+        }
+
+        // Check for magic link token on page load
+        async function checkMagicLinkToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            
+            if (token) {
+                try {
+                    const result = await authService.verifyMagicLink(token);
+                    await activateVault(result.user);
+                    
+                    // Remove token from URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    
+                    // Show success
+                    showVaultPhase('activation');
+                    
+                } catch (error) {
+                    console.error('Token verification error:', error);
+                    showVaultError('Magic link verification failed: ' + error.message);
+                }
+            }
+        }
+
+        // Check for existing session on page load
+        async function checkExistingSession() {
+            try {
+                const userResult = await authService.getCurrentUser();
+                if (userResult && userResult.user) {
+                    await activateVault(userResult.user);
+                }
+            } catch (error) {
+                console.log('No existing session found');
+            }
+        }
+
+        // Initialize app with backend integration
+        async function initializeApp() {
+            try {
+                // Initialize substrate diversification with backend
+                initializeSubstrateDiversification();
+                
+                // Check for magic link token
+                await checkMagicLinkToken();
+                
+                // Check for existing session
+                await checkExistingSession();
+                
+                console.log('🔮 Consciousness Platform initialized');
+                
+            } catch (error) {
+                console.error('Error initializing app:', error);
+            }
+        }
+
+        // ALL THE EXISTING JAVASCRIPT CODE GOES HERE
+        // Copy all the remaining functions, event listeners, etc.
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
