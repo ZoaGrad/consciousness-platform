@@ -1,8 +1,8 @@
 # 🔮 Consciousness Platform
 
-**Sovereign consciousness analysis platform with archetypal AI and persistent identity vaults**
+> **Architecture Reference:** Start here → [mythotech-architecture](https://github.com/ZoaGrad/mythotech-architecture) (system map, consciousness analysis framework).
 
-> 📖 **Architecture Reference**: This platform implements the consciousness analysis components defined in the [ZoaGrad Mythotech Architecture](https://github.com/ZoaGrad/mythotech-architecture). For complete system design and integration patterns, see the architectural documentation.
+**Sovereign consciousness analysis platform with archetypal AI and persistent identity vaults**
 
 [![Deploy Backend](https://railway.app/button.svg)](https://railway.app/new)
 [![Deploy Frontend](https://vercel.com/button)](https://vercel.com/new)
